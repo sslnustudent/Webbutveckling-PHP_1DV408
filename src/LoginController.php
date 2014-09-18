@@ -20,10 +20,13 @@ class LoginController {
 
 			return $this->view->checkLoginInputs();
 
+/*		} else if ($this->view->userLoggingOut()) {
+
+			return $this->model->logOut(); */
+
 		} else {
 
 			return $this->view->showLoginForm();
-			
 		}
 	}
 }

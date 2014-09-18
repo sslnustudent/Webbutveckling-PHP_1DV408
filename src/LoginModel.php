@@ -9,18 +9,27 @@ class LoginModel {
 
 	}
 
-/*	public function login($username, $password) {
+	public function login($username, $password) {
 
-		If {$this->username == $username && $this->password = $password} {
-			$_SESSION['user'] = $username;
+		$this->username = $this->username = $_POST['Username'];
+		$this->password = $this->password = $_POST['Password'];
 
-			return $username;
+		If ($this->username == $username && $this->password == $password) {
+
+			$_SESSION['LoggedIn'] = true;
+
+			return true;
 		}
-		if (isset($_SESSION['LoggedIn']) == true) {
 
-			$_SESSION['username'] = $username;
+		return false;
+	} 
 
-			return $username;
-		} 
-	} */
+	public function logOut() {
+
+		if (isset($_GET['logOut'])) {
+	  		unset($_SESSION['LoggedIn']);
+		}
+//        	echo "<META HTTP-EQUIV='Refresh' Content='0; URL=index.php'>";
+        	return;
+	 }
 }

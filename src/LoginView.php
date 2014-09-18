@@ -7,6 +7,8 @@ class LoginView {
 	private $status = "";
 	private $username;
 	private $password;
+	private $showDateTime;
+
 
 	public function __construct(LoginModel $model) {
 		$this->model = $model;
@@ -26,18 +28,6 @@ class LoginView {
 
 		$name = isset($_POST['Username']) ? $_POST['Username'] : '';
 		$showDateTime = $this->showDate();
-
-/*		if ($this->model->doLogin($this->username, $this->password)) {
-
-			$uName = $this->username;
-
-			$ret = $this->message = "<h2>Admin är inloggad</h2>";
-
-			$ret .= "<p><a href='?logOut' title='Logout'>Logga ut</p>";
-
-			return $ret;
-
-		} else { */
 
 		$ret = $this->message = "<h2>Ej inloggad</h2>";
 
@@ -67,23 +57,46 @@ class LoginView {
 		return false;
 	}
 
-/*	public function userLoggedIn() {
-		
-		$correct = $this->status = "Inloggningen lyckades";
+	public function userLoggedIn() {
 
-	    return $this->showLoginForm($correct);
-
+		$showDateTime = $this->showDate();
 		
+		$ret = $this->message = "<h2>$this->username är inloggad</h2>";
+
+		$ret .= "
+				<form name='logout' method='get' accept-charset='utf-8'>
+				<p><input type='submit' name='logout' value='Logga ut'></p>
+				</form>";
+
+		$ret .= "<p>$showDateTime</p>";
+
+	/*	if (isset($_GET['logOut'])) {
+
+			$this->model->logout();
+		} */
+
+		return $ret;		
 	} 
+
+/*	public function userLoggingOut() {
+
+		if (isset($_GET['logout'])) {
+
+			return true;
+		}
+		return false;
+	} */
 
 	public function userLoggedOut() {
 
-	  	if (isset($GET["logOut"])) {
-	  		unset($_SESSION['LoggedIn']);
-        	unset($_SESSION['userName']);
-        	session_destroy();
-	  	}
-	 } */
+		if ($this->model->logOut()) {
+
+			$loggedOut = $this->status = "Du har nu loggat ut";
+
+			return $this->showLoginForm($loggedOut);
+		}
+	}
+
 
 	public function checkLoginInputs() {
 
@@ -118,11 +131,13 @@ class LoginView {
 		   			$this->username = $_POST['Username'];
 		   			$this->password = $_POST['Password'];
 
-		   			if($this->model->login($this->username, $this->password)) {
+		   			$this->model->login($this->username, $this->password);
+
+		   			if($this->userLoggedIn()) {
 
 		    		$correct = $this->status = "Inloggningen lyckades";
 
-		    		return $this->showLoginForm($correct); 
+		    		return $this->userLoggedIn($correct); 
 		    		}
 		   		} 
 
@@ -131,6 +146,13 @@ class LoginView {
 	   		return $this->showLoginForm($incorrect);
 		}
 	} 
+
+	public function checkBox() {
+
+		if (isset($_POST['remember'])) 
+			return true;
+		return false;
+	}
 }
 
 
