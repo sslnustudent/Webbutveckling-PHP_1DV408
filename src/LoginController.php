@@ -3,6 +3,7 @@
 require_once("LoginModel.php");
 require_once("LoginView.php");
 
+
 class LoginController {
 
 	private $model;
@@ -14,19 +15,38 @@ class LoginController {
 		$this->view = new LoginView($this->model);
 	}
 
-	public function doSubmit() {
+	public function doCheckLogin() {
 
-		if ($this->view->userSubmitted()) {
+		$status = "";
+		$body;
+		$message = "";
+		$showDateTime = $this->view->showDate();
 
-			return $this->view->checkLoginInputs();
+		// Inloggningscase
+		if ($this->view->userLoggingIn()) {
 
-/*		} else if ($this->view->userLoggingOut()) {
+			$status = "<h2>Ej inloggad</h2>";
+			$body = $this->view->showLoginForm();
+			$message = $this->model->checkLoginInputs();
 
-			return $this->model->logOut(); */
+			if ($this->model->login($this->view->getUsername(), $this->view->getPassword())) {
 
+				if ($this->view->checkBox()) {
+
+					$this->view->keepUserLoggedIn();
+					
+				}
+
+				$this->view->userLoggedInPage();
+			}
+
+			$this->model->userIsLoggedIn(); 
+			
 		} else {
 
 			return $this->view->showLoginForm();
-		}
+		}	
+
+		return $status . $message . $body . $showDateTime;
 	}
 }

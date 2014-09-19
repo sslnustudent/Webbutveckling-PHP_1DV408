@@ -9,16 +9,44 @@ class LoginModel {
 
 	}
 
+	public function checkLoginInputs() {
+
+		if(empty($_POST['Username']) && empty($_POST['Password'])) {
+
+			return "Användarnamn saknas";
+
+		} elseif (empty($_POST['Username'])) {
+
+			return "Användarnamn saknas";
+
+		} elseif (empty($_POST['Password'])) {
+
+			return "Lösenord saknas";
+
+		} elseif (isset($_POST['Username']) && isset($_POST['Password'])) {
+	  
+		   		if ($_POST['Username']=='Admin' && $_POST['Password']=='Password') {
+
+		   			return "Inloggningen lyckades";
+		   		} 
+
+	   		return "Felaktigt användarnamn och/eller lösenord";
+		}
+	}
+
 	public function login($username, $password) {
 
-		$this->username = $this->username = $_POST['Username'];
-		$this->password = $this->password = $_POST['Password'];
+		if ($_POST['Username']=='Admin' && $_POST['Password']=='Password'){
 
-		If ($this->username == $username && $this->password == $password) {
+		   	$this->username = $_POST['Username'];
+		   	$this->password = $_POST['Password'];
 
-			$_SESSION['LoggedIn'] = true;
+			if ($this->username == $username && $this->password == $password) {
 
-			return true;
+				$_SESSION['LoggedIn'] = true;
+
+				return true;
+			}	
 		}
 
 		return false;
@@ -30,6 +58,19 @@ class LoginModel {
 	  		unset($_SESSION['LoggedIn']);
 		}
 //        	echo "<META HTTP-EQUIV='Refresh' Content='0; URL=index.php'>";
-        	return;
-	 }
+        return;
+	}
+
+	public function userIsLoggedIn() {
+
+		if (isset($_SESSION['LoggedIn'])) {
+
+			return true;		
+		}
+
+		return false;
+	}
 }
+
+
+
