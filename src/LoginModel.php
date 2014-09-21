@@ -9,61 +9,44 @@ class LoginModel {
 
 	}
 
-	public function checkLoginInputs() {
+	// Kontroll av sessionvariabeln
+	public function getSessionUsername() {
 
-		if(empty($_POST['Username']) && empty($_POST['Password'])) {
+		if (isset($_SESSION['username'])) {
 
-			return "Användarnamn saknas";
+			return $_SESSION['username'];
+		} 
 
-		} elseif (empty($_POST['Username'])) {
-
-			return "Användarnamn saknas";
-
-		} elseif (empty($_POST['Password'])) {
-
-			return "Lösenord saknas";
-
-		} elseif (isset($_POST['Username']) && isset($_POST['Password'])) {
-	  
-		   		if ($_POST['Username']=='Admin' && $_POST['Password']=='Password') {
-
-		   			return "Inloggningen lyckades";
-		   		} 
-
-	   		return "Felaktigt användarnamn och/eller lösenord";
-		}
+		return "";
 	}
 
+	// Kontroll av inloggningsuppgifter
 	public function login($username, $password) {
 
-		if ($_POST['Username']=='Admin' && $_POST['Password']=='Password'){
+		if ($username =='Admin' && $password =='Password'){
 
-		   	$this->username = $_POST['Username'];
-		   	$this->password = $_POST['Password'];
+				$_SESSION['LoggedIn'] = "success";
+				$_SESSION['username'] = $username;
 
-			if ($this->username == $username && $this->password == $password) {
-
-				$_SESSION['LoggedIn'] = true;
-
-				return true;
-			}	
+				return true;	
 		}
 
 		return false;
 	} 
 
+	// Utloggning
 	public function logOut() {
 
-		if (isset($_GET['logOut'])) {
-	  		unset($_SESSION['LoggedIn']);
-		}
-//        	echo "<META HTTP-EQUIV='Refresh' Content='0; URL=index.php'>";
-        return;
+	  	unset($_SESSION['LoggedIn']);
+	  	unset($_SESSION['username']);
+
+        return "Du har nu loggat ut";
 	}
 
+	// Kontrollerar om användaren är inloggad
 	public function userIsLoggedIn() {
 
-		if (isset($_SESSION['LoggedIn'])) {
+		if (isset($_SESSION['LoggedIn']) && $_SESSION['LoggedIn']) {
 
 			return true;		
 		}
