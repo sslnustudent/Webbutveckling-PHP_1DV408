@@ -2,11 +2,35 @@
 <?php
 
 class LoginView {
-
+	
+	/**
+	*	Constants for error and success messages
+	*/
+	const MESSAGE_ERROR_COOKIE_LOGIN = 'Felaktig information i cookie.';
+	const MESSAGE_SUCCESS_COOKIE_LOGIN = 'Inloggning lyckades via cookies.';
+	const MESSAGE_ERROR_USERNAME_PASSWORD = 'Felaktigt användarnamn och/eller lösenord.';
+	const MESSAGE_ERROR_USERNAME = 'Användarnamn saknas.';
+	const MESSAGE_ERROR_PASSWORD = 'Lösenord saknas.';
+	const MESSAGE_SUCCESS_LOGIN = 'Inloggning lyckades.';
+	const MESSAGE_SUCCESS_LOGIN_REMEBER = 'Inloggning lyckades och vi kommer ihåg dig nästa gång.';
+	const MESSAGE_SUCCESS_LOGOUT = 'Du har nu loggat ut.';
+	
+	private $strUsernameCookie = 'username';
+	private $strPasswordCookie = 'password';
+	private $strTokenCookie = 'cookietoken';
+	
 	private $model;
-	private $username;
-	private $password;
-	private $message = "";
+	
+	/**
+	*	Not used
+	*/
+	//private $username;
+	//private $password;
+	
+	private $message = '';
+	private $body = '';
+	private $boolLoggedInStatus = false;
+	private $loggedInUser;
 
 	public function __construct(LoginModel $model) {
 		$this->model = $model;
@@ -24,9 +48,9 @@ class LoginView {
 
 	public function getCookieName() {
 
-		if (isset($_COOKIE['username'])) {
+		if (isset($_COOKIE[$this->strUsernameCookie])) {
 
-			return $_COOKIE['username'];
+			return $_COOKIE[$this->strUsernameCookie];
 		}
 
 		return NULL;
@@ -35,9 +59,9 @@ class LoginView {
 	// Hämtar lösenord som är sparad i cookien
 	public function getCookiePassword() {
 
-		if (isset($_COOKIE['password'])) {
+		if (isset($_COOKIE[$this->strPasswordCookie])) {
 
-			return $_COOKIE['password'];
+			return $_COOKIE[$this->strPasswordCookie];
 		}
 
 		return NULL;
@@ -46,9 +70,9 @@ class LoginView {
 	// Hämtar token 
 	public function getCookieToken() {
 
-		if (isset($_COOKIE['cookietoken'])) {
+		if (isset($_COOKIE[$this->strTokenCookie])) {
 
-			return $_COOKIE['cookietoken'];
+			return $_COOKIE[$this->strTokenCookie];
 		}
 
 		return NULL;
@@ -79,11 +103,11 @@ class LoginView {
 
 	public function removeCookies() {
 
-		if(isset($_COOKIE['username']) && isset($_COOKIE['password']) && isset($_COOKIE['password'])) {
+		if(isset($_COOKIE[$this->strUsernameCookie]) && isset($_COOKIE[$this->strPasswordCookie]) && isset($_COOKIE[$this->strPasswordCookie])) {
 
-				setcookie('username', '', time() - 1*24*60*60);
-            	setcookie('password', '', time() - 1*24*60*60);
-            	setcookie('cookietoken', '', time() - 1*24*60*60);
+				setcookie($this->strUsernameCookie, '', time() - 1*24*60*60);
+            	setcookie($this->strPasswordCookie, '', time() - 1*24*60*60);
+            	setcookie($this->strTokenCookie, '', time() - 1*24*60*60);
 
         }
 
@@ -103,20 +127,20 @@ class LoginView {
 
 		if (!isset($_POST['remember'])) {
 
-			if(isset($_COOKIE['username']) && isset($_COOKIE['password'])) {
+			if(isset($_COOKIE[$this->strUsernameCookie]) && isset($_COOKIE[$this->strPasswordCookie])) {
 
-				setcookie('username', '', time() - 1*24*60*60);
-            	setcookie('password', '', time() - 1*24*60*60);
-            	setcookie('cookietoken', '', time() - 1*24*60*60);
+				setcookie($this->strUsernameCookie, '', time() - 1*24*60*60);
+            	setcookie($this->strPasswordCookie, '', time() - 1*24*60*60);
+            	setcookie($this->strTokenCookie, '', time() - 1*24*60*60);
             }
 		}
 
 		$passwordIsEncrypted = crypt($_POST['Password']);
 		$cookieToken = $this->setCookieToken();
 
-		setcookie('username', $_POST['Username'], time() + 1*24*60*60);
-		setcookie('password', $passwordIsEncrypted, time() + 1*24*60*60);
-		setcookie('cookietoken', $cookieToken, time() + 1*24*60*60);
+		setcookie($this->strUsernameCookie, $_POST['Username'], time() + 1*24*60*60);
+		setcookie($this->strPasswordCookie, $passwordIsEncrypted, time() + 1*24*60*60);
+		setcookie($this->strTokenCookie, $cookieToken, time() + 1*24*60*60);
 	}
 
 	// Sätter aktuell tid och datum
@@ -135,17 +159,18 @@ class LoginView {
 		$name = isset($_POST['Username']) ? $_POST['Username'] : '';
 
 		$ret = "
-			  	<form name='login' method='post' accept-charset='utf-8'>
-					<div>
-						<p>Login - Skriv in användarnamn och lösenord</p>
-						<p><label for='username'>Användarnamn</label>
-						<input type='username' name='Username' value='$name'></p>
-						<p><label for='password'>Lösenord</label>
-						<input type='password' name='Password'></p>
-						<p><input type='submit' name='submit' value='Logga in'></p>
-						<p>Håll mig inloggad: <input type='checkbox' name='remember' value='checkbox'></p>
-					</div>
-				</form>";
+		  	<form name='login' method='post' accept-charset='utf-8'>
+				<div>
+					<p>Login - Skriv in användarnamn och lösenord</p>
+					<p><label for='username'>Användarnamn</label>
+					<input type='username' name='Username' value='$name'></p>
+					<p><label for='password'>Lösenord</label>
+					<input type='password' name='Password'></p>
+					<p>Håll mig inloggad: <input type='checkbox' name='remember' value='checkbox'></p>
+					<p><input type='submit' name='submit' value='Logga in'></p>
+				</div>
+			</form>
+		";
 
 		return $ret;
 	}
@@ -158,9 +183,10 @@ class LoginView {
 	//	$ret = $this->message = "<h2>$this->username är inloggad</h2>";
 
 		$ret = "
-				<form name='logout' method='post' accept-charset='utf-8'>
+			<form name='logout' method='post' accept-charset='utf-8'>
 				<p><input type='submit' name='logout' value='Logga ut'></p>
-				</form>";
+			</form>
+		";
 
 	//	$ret .= "<p>$showDateTime</p>";
 
@@ -186,7 +212,38 @@ class LoginView {
 		}
 		return false;
 	}
+	
+	/**
+	*	Added View Methods
+	*/
+	public function setMessage($s){
+		$this->message = '<p>' . $s . '</p>';
+	}
+	
+	public function setBody($s){
+		$this->body = $s;
+	}
+	
+	public function setLoggedInStatus($b){
+		$this->boolLoggedInStatus = $b;
+	}
+	
+	public function setLoggedInUser($s){
+		$this->loggedInUser = $s;
+	}
+	
+	public function renderHTML(){
+		return $this->getStatusHtml() . $this->message . $this->body . $this->showDate();
+	}
+	
+	public function getStatusHtml(){
+		if($this->boolLoggedInStatus){
+			return '<h2>' . $this->loggedInUser . ' är inloggad</h2>';
+		}
+		return '<h2>Ej inloggad</h2>';
+	}
+	
+	public function getUsernameFromCookie(){
+		return isset($_COOKIE[$this->strUsernameCookie]) ? $_COOKIE[$this->strUsernameCookie] : '';
+	}
 }
-
-
-
