@@ -25,10 +25,10 @@ class LoginModel {
 
 		if ($username =='Admin' && $password =='Password'){
 
-				$_SESSION['LoggedIn'] = "success";
-				$_SESSION['username'] = $username;
+			$_SESSION['LoggedIn'] = "success";
+			$_SESSION['username'] = $username;
 
-				return true;	
+			return true;	
 		}
 
 		return false;
@@ -39,9 +39,11 @@ class LoginModel {
 
 	  	unset($_SESSION['LoggedIn']);
 	  	unset($_SESSION['username']);
+	  	session_destroy();
 
         return "Du har nu loggat ut";
 	}
+
 
 	// Kontrollerar om användaren är inloggad
 	public function userIsLoggedIn() {

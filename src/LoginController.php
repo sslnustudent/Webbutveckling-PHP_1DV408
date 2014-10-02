@@ -22,11 +22,11 @@ class LoginController {
 		$message = "";
 		$showDateTime = $this->view->showDate();
 
-/*		if ($this->model->userIsLoggedIn()) {
+		if ($this->model->userIsLoggedIn()) {
 
 			$this->model->userIsLoggedIn();
 			$this->view->showUserLoggedInPage();
-		} */
+		} 
 
 		// Utloggningscase
 		if ($this->view->userPressedLogout()) {
@@ -100,12 +100,19 @@ class LoginController {
 				$message = "<p>Inloggning lyckades via cookies</p>";
 				$body = $this->view->showUserLoggedInPage(); 
 
+					if ($this->view->userPressedLogout()) {
+
+						$this->view->removeCookies();
+						$message = $this->model->logout();
+						$body = $this->view->showLoginForm();
+					}
+
 			} else {
 
 				$status = "<h2>Ej inloggad</h2>";
 				$message = "<p>Felaktig information i cookie</p>";
 				$body = $this->view->showLoginForm(); 
-				$this->view->removeCookies();
+			//	$this->view->removeCookies();
 			}			
 		}
 

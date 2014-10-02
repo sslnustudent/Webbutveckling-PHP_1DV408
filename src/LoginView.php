@@ -18,8 +18,12 @@ class LoginView {
 		if(isset($_POST['remember'])) {
 			
 			return true;
+
+		} else {
+
+			return false;
 		}
-		return false;
+		
 	}
 
 	public function getCookieName() {
@@ -27,9 +31,11 @@ class LoginView {
 		if (isset($_COOKIE['username'])) {
 
 			return $_COOKIE['username'];
-		}
 
-		return NULL;
+		} else {
+
+			return NULL;
+		}		
 	}
 
 	// Hämtar lösenord som är sparad i cookien
@@ -38,9 +44,11 @@ class LoginView {
 		if (isset($_COOKIE['password'])) {
 
 			return $_COOKIE['password'];
-		}
 
-		return NULL;
+		} else {
+
+			return NULL;
+		}		
 	}
 
 	// Hämtar token 
@@ -49,9 +57,11 @@ class LoginView {
 		if (isset($_COOKIE['cookietoken'])) {
 
 			return $_COOKIE['cookietoken'];
-		}
 
-		return NULL;
+		} else {
+
+			return NULL;
+		}
 	}
 
 	// Hämtar input från användarnamnsfältet
@@ -61,8 +71,10 @@ class LoginView {
 
 			return "";
 
-		} 
-		return $_POST['Username'];
+		} else {
+
+			return $_POST['Username'];
+		}		
 	}
 
 	// Hämtar input från användarnamnsfältet
@@ -72,22 +84,24 @@ class LoginView {
 
 			return "";
 
-		} 
-		
-		return $_POST['Password'];
+		} else {
+
+			return $_POST['Password'];
+		}		
 	}
 
 	public function removeCookies() {
 
-		if(isset($_COOKIE['username']) && isset($_COOKIE['password']) && isset($_COOKIE['password'])) {
+		if(isset($_COOKIE['username']) || isset($_COOKIE['password']) || isset($_COOKIE['cookietoken'])) {
 
 				setcookie('username', '', time() - 1*24*60*60);
             	setcookie('password', '', time() - 1*24*60*60);
             	setcookie('cookietoken', '', time() - 1*24*60*60);
 
-        }
+        } else {
 
-        return NULL; 
+        	return NULL;
+        }        
 	}
 
 	public function setCookieToken() {
@@ -103,13 +117,14 @@ class LoginView {
 
 		if (!isset($_POST['remember'])) {
 
-			if(isset($_COOKIE['username']) && isset($_COOKIE['password'])) {
+			if(isset($_COOKIE['username']) || isset($_COOKIE['password']))
+			{
 
 				setcookie('username', '', time() - 1*24*60*60);
             	setcookie('password', '', time() - 1*24*60*60);
-            	setcookie('cookietoken', '', time() - 1*24*60*60);
+        //    	setcookie('cookietoken', '', time() - 1*24*60*60);
             }
-		}
+		} 
 
 		$passwordIsEncrypted = crypt($_POST['Password']);
 		$cookieToken = $this->setCookieToken();
@@ -153,16 +168,10 @@ class LoginView {
 	// Visar inloggade sidan
 	public function showUserLoggedInPage() {
 
-	//	$showDateTime = $this->showDate();
-		
-	//	$ret = $this->message = "<h2>$this->username är inloggad</h2>";
-
 		$ret = "
 				<form name='logout' method='post' accept-charset='utf-8'>
 				<p><input type='submit' name='logout' value='Logga ut'></p>
 				</form>";
-
-	//	$ret .= "<p>$showDateTime</p>";
 
 		return $ret;		
 	} 
