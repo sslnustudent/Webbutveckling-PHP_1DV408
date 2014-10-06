@@ -17,141 +17,92 @@ class LoginController {
 
 	public function doCheckLogin() {
 
-		//$status = "";
-		//$body;
-		//$message = "";
-		//$showDateTime = $this->view->showDate();
-
-		if ($this->model->userIsLoggedIn()) {
-
-			$this->model->userIsLoggedIn();
-			$this->view->showUserLoggedInPage();
-		} 
-
 		// Utloggningscase
 		if ($this->view->userPressedLogout()) {
 
-			//$message = $this->model->logout();
+			$this->view->removeCookies();
 			$this->model->logout();
 			$this->view->setMessage(LoginView::MESSAGE_SUCCESS_LOGOUT);
-			//$body = $this->view->showLoginForm();
+
 			return $this->loginPage();
 		}
 
 		// Användaren är inloggad via session
 		if ($this->model->userIsLoggedIn()) {
 
-			//$user = $this->model->getSessionUsername();
-			//$status = "<h2>$user är inloggad</h2>";
-			$this->view->setLoggedInStatus(true);
-			$this->view->setLoggedInUser($this->model->getSessionUsername());
-			//$body = $this->view->showUserLoggedInPage();
-			return $this->successPage();
+			if ($this->model->getSessionControl() == false) {
 
-		} //else {
+				return $this->loginPage();
 
-			// Inloggningscase
-			//$status = "<h2>Ej inloggad</h2>";
-			//$this->view->setLoggedInStatus(false);
-			//$body = $this->view->showLoginForm();
+			} else {
 
-			if ($this->view->userPressedLogin() == true) {
+				$this->view->setLoggedInStatus(true);
+				$this->view->setLoggedInUser($this->model->getSessionUsername());
 
-				if ($this->model->login($this->view->getUsername(), $this->view->getPassword())) {
+				return $this->successPage();
+			}
 
-					if ($this->view->checkBoxMarked()) {
+		} 
 
-						//$user = $this->model->getSessionUsername();
-						//$status = "<h2>$user är inloggad</h2>";
-						//$message = "<p>Inloggning lyckades och vi kommer ihåg dig nästa gång</p>";
-						$this->view->setMessage(LoginView::MESSAGE_SUCCESS_LOGIN_REMEBER);
-						//$body = $this->view->showUserLoggedInPage();
-						$this->view->keepUserLoggedIn();
+		if ($this->view->userPressedLogin() == true) {
 
-					} else {
+			if ($this->model->login($this->view->getUsername(), $this->view->getPassword())) {
 
-						//$user = $this->model->getSessionUsername();
-						//$status = "<h2>$user är inloggad</h2>";
-						//$message = "<p>Inloggning lyckades</p>";
-						$this->view->setMessage(LoginView::MESSAGE_SUCCESS_LOGIN);
-						//$body = $this->view->showUserLoggedInPage();
-						
-					}
-					
-					$this->view->setLoggedInStatus(true);
-					$this->view->setLoggedInUser($this->model->getSessionUsername());
-					return $this->successPage();
+				if ($this->view->checkBoxMarked()) {
+
+					$this->view->setMessage(LoginView::MESSAGE_SUCCESS_LOGIN_REMEBER);
+					$this->view->keepUserLoggedIn();
 
 				} else {
+
+					$this->view->setMessage(LoginView::MESSAGE_SUCCESS_LOGIN);						
+				}
+					
+				$this->view->setLoggedInStatus(true);
+				$this->view->setLoggedInUser($this->model->getSessionUsername());
+				return $this->successPage();
+
+			} else {
 						
-					if ($this->view->getUsername() == "") {
+				if ($this->view->getUsername() == "") {
 
-						//$message = "Användarnamn saknas";
-						$this->view->setMessage(LoginView::MESSAGE_ERROR_USERNAME);
+					$this->view->setMessage(LoginView::MESSAGE_ERROR_USERNAME);
 
-					} elseif ($this->view->getPassword() == "") {
+				} elseif ($this->view->getPassword() == "") {
 
-						//$message = "Lösenord saknas";
-						$this->view->setMessage(LoginView::MESSAGE_ERROR_PASSWORD);
+					$this->view->setMessage(LoginView::MESSAGE_ERROR_PASSWORD);
 
-					} else {
+				} else {
 
-						//$message = "Felaktigt användarnamn och/eller lösenord";
-						$this->view->setMessage(LoginView::MESSAGE_ERROR_USERNAME_PASSWORD);
-					} 
+					$this->view->setMessage(LoginView::MESSAGE_ERROR_USERNAME_PASSWORD);
+				} 
 					
 					$this->view->setLoggedInStatus(false);
 					return $this->loginPage();
 				}
 
 			}
-		//}
 
 		//Inloggad via håll mig inloggad-checkboxen
-		//if ($this->view->getCookieName() && $this->view->getCookiePassword()) {
-		if ($this->view->getCookieName() !== null && $this->view->getCookiePassword() !== null) {
+		if ($this->view->getCookieName() !== null && $this->view->getCookiePassword() !== null && $this->view->getCookieToken() !== null) {
+			
+			if ($this->view->getCookieControl()) {
 
-			$token = $this->view->setCookieToken();
-
-			if ($token == $this->view->getCookieToken()) {
-
-				//$user = $this->view->getCookieName();
-				//$status = "<h2>$user är inloggad</h2>";
 				$this->view->setLoggedInStatus(true);
-				$this->view->setLoggedInUser($this->model->getSessionUsername());
-				//$message = "<p>Inloggning lyckades via cookies</p>";
+				$this->view->setLoggedInUser($this->view->getCookieName());
 				$this->view->setMessage(LoginView::MESSAGE_SUCCESS_COOKIE_LOGIN);
-				//$body = $this->view->showUserLoggedInPage(); 
+
 				return $this->successPage();
-
-					if ($this->view->userPressedLogout()) {
-
-						$this->view->removeCookies();
-						$message = $this->model->logout();
-						$body = $this->view->showLoginForm();
-					}
 
 			} else {
 
-<<<<<<< HEAD
-				$status = "<h2>Ej inloggad</h2>";
-				$message = "<p>Felaktig information i cookie</p>";
-				$body = $this->view->showLoginForm(); 
-			//	$this->view->removeCookies();
-=======
-				//$status = "<h2>Ej inloggad</h2>";
 				$this->view->setLoggedInStatus(false);
-				//$message = "<p>Felaktig information i cookie</p>";
 				$this->view->setMessage(LoginView::MESSAGE_ERROR_COOKIE_LOGIN);
-				//$body = $this->view->showLoginForm(); 
 				$this->view->removeCookies();
 				return $this->loginPage();
->>>>>>> origin/master
-			}			
-		}
 
-		//return $status . $message . $body . $showDateTime;
-		
+			}	
+		}		
 		/**
 		*	Fallback to login page just in case something fails
 		*/

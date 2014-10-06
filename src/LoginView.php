@@ -18,15 +18,7 @@ class LoginView {
 	private $strUsernameCookie = 'username';
 	private $strPasswordCookie = 'password';
 	private $strTokenCookie = 'cookietoken';
-	
-	private $model;
-	
-	/**
-	*	Not used
-	*/
-	//private $username;
-	//private $password;
-	
+	private $model;	
 	private $message = '';
 	private $body = '';
 	private $boolLoggedInStatus = false;
@@ -50,16 +42,21 @@ class LoginView {
 		
 	}
 
+	public function getCookieControl() {
+
+		if ($_COOKIE[$this->strTokenCookie] == $_COOKIE[$this->strPasswordCookie]) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public function getCookieName() {
 
 		if (isset($_COOKIE[$this->strUsernameCookie])) {
 
-<<<<<<< HEAD
-			return $_COOKIE['username'];
-=======
 			return $_COOKIE[$this->strUsernameCookie];
-		}
->>>>>>> origin/master
 
 		} else {
 
@@ -72,12 +69,7 @@ class LoginView {
 
 		if (isset($_COOKIE[$this->strPasswordCookie])) {
 
-<<<<<<< HEAD
-			return $_COOKIE['password'];
-=======
 			return $_COOKIE[$this->strPasswordCookie];
-		}
->>>>>>> origin/master
 
 		} else {
 
@@ -90,12 +82,7 @@ class LoginView {
 
 		if (isset($_COOKIE[$this->strTokenCookie])) {
 
-<<<<<<< HEAD
-			return $_COOKIE['cookietoken'];
-=======
 			return $_COOKIE[$this->strTokenCookie];
-		}
->>>>>>> origin/master
 
 		} else {
 
@@ -130,28 +117,23 @@ class LoginView {
 	}
 
 	public function removeCookies() {
-
-<<<<<<< HEAD
-		if(isset($_COOKIE['username']) || isset($_COOKIE['password']) || isset($_COOKIE['cookietoken'])) {
-=======
-		if(isset($_COOKIE[$this->strUsernameCookie]) && isset($_COOKIE[$this->strPasswordCookie]) && isset($_COOKIE[$this->strPasswordCookie])) {
->>>>>>> origin/master
-
-				setcookie($this->strUsernameCookie, '', time() - 1*24*60*60);
-            	setcookie($this->strPasswordCookie, '', time() - 1*24*60*60);
-            	setcookie($this->strTokenCookie, '', time() - 1*24*60*60);
-
-        } else {
-
-        	return NULL;
-        }        
+		setcookie($this->strUsernameCookie, '', time() - 1*24*60*60);
+        setcookie($this->strPasswordCookie, '', time() - 1*24*60*60);
+        setcookie($this->strTokenCookie, '', time() - 1*24*60*60);
 	}
 
 	public function setCookieToken() {
 
-		$cookieToken = crypt(date("1") . $_SERVER["HTTP_USER_AGENT"] . date("d"));
+		$cookieToken = $this->setEncryptPassword();
 
 		return $cookieToken;
+	}
+
+	public function setEncryptPassword() {
+
+		$passwordIsEncrypted = md5($this->getPassword() . time());
+
+		return $passwordIsEncrypted;
 	}
 
 	/* Skapar cookies för att hålla användaren inloggad om checkbox markerad
@@ -160,29 +142,17 @@ class LoginView {
 
 		if (!isset($_POST['remember'])) {
 
-<<<<<<< HEAD
-			if(isset($_COOKIE['username']) || isset($_COOKIE['password']))
-			{
-
-				setcookie('username', '', time() - 1*24*60*60);
-            	setcookie('password', '', time() - 1*24*60*60);
-        //    	setcookie('cookietoken', '', time() - 1*24*60*60);
-=======
 			if(isset($_COOKIE[$this->strUsernameCookie]) && isset($_COOKIE[$this->strPasswordCookie])) {
 
-				setcookie($this->strUsernameCookie, '', time() - 1*24*60*60);
-            	setcookie($this->strPasswordCookie, '', time() - 1*24*60*60);
-            	setcookie($this->strTokenCookie, '', time() - 1*24*60*60);
->>>>>>> origin/master
-            }
-		} 
+				setcookie($this->strUsernameCookie, '', time() - 3600);
+	            setcookie($this->strPasswordCookie, '', time() - 3600);
+	            setcookie($this->strTokenCookie, '', time() - 3600);
+	        }
+		}
 
-		$passwordIsEncrypted = crypt($_POST['Password']);
-		$cookieToken = $this->setCookieToken();
-
-		setcookie($this->strUsernameCookie, $_POST['Username'], time() + 1*24*60*60);
-		setcookie($this->strPasswordCookie, $passwordIsEncrypted, time() + 1*24*60*60);
-		setcookie($this->strTokenCookie, $cookieToken, time() + 1*24*60*60);
+		setcookie($this->strUsernameCookie, $this->getUsername(), time() + 3600);
+		setcookie($this->strPasswordCookie, $this->setEncryptPassword(), time() + 3600);
+		setcookie($this->strTokenCookie, $this->setCookieToken(), time() + 3600);
 	}
 
 	// Sätter aktuell tid och datum
@@ -252,20 +222,20 @@ class LoginView {
 	/**
 	*	Added View Methods
 	*/
-	public function setMessage($s){
-		$this->message = '<p>' . $s . '</p>';
+	public function setMessage($msg){
+		$this->message = '<p>' . $msg . '</p>';
 	}
 	
-	public function setBody($s){
-		$this->body = $s;
+	public function setBody($body){
+		$this->body = $body;
 	}
 	
-	public function setLoggedInStatus($b){
-		$this->boolLoggedInStatus = $b;
+	public function setLoggedInStatus($status){
+		$this->boolLoggedInStatus = $status;
 	}
 	
-	public function setLoggedInUser($s){
-		$this->loggedInUser = $s;
+	public function setLoggedInUser($user){
+		$this->loggedInUser = $user;
 	}
 	
 	public function renderHTML(){
