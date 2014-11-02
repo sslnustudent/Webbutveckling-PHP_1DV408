@@ -172,6 +172,9 @@ class LoginView {
 
 		$ret = "
 		  	<form name='login' method='post' accept-charset='utf-8'>
+		  		<div>
+					<p><input type='submit' name='newuser' value='Ny användare'></p>
+				</div>
 				<div>
 					<p>Login - Skriv in användarnamn och lösenord</p>
 					<p><label for='username'>Användarnamn</label>
@@ -198,6 +201,15 @@ class LoginView {
 
 		return $ret;		
 	} 
+	// Kontroll för ny användare
+	public function userPressedNewUser() {
+
+		if (isset($_POST['newuser'])) {
+
+			return true;
+		} 			 
+		return false;
+	}
 
 	// Kontrollerar om användaren tryckt på logga in-knappen
 	public function userPressedLogin() {
@@ -208,6 +220,7 @@ class LoginView {
 		} 			 
 		return false;
 	}
+
 
 	// Kontrollerar om användaren tryckt på logga ut-knappen
 	public function userPressedLogout() {

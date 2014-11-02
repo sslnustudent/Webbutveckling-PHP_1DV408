@@ -2,20 +2,39 @@
 
 require_once("LoginModel.php");
 require_once("LoginView.php");
+require_once("RegisterView.php");
 
 
 class LoginController {
 
 	private $model;
-	private $view;  
+	private $view;
+	private $newView;
 
 	public function __construct() {
 
 		$this->model = new LoginModel();
 		$this->view = new LoginView($this->model);
+		$this->newView = new RegisterView();
 	}
 
 	public function doCheckLogin() {
+
+		if($this->newView->userPressedRegister())
+		{
+			return $this->newView->View();
+		}
+
+
+		if($this->newView->userPressedBack())
+		{
+			return $this->loginPage();
+		}
+
+		if($this->view->userPressedNewUser())
+		{
+			return  $this->newView->View();
+		}
 
 		// Utloggningscase
 		if ($this->view->userPressedLogout()) {

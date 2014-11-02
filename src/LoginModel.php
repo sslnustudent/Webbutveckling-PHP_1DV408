@@ -1,6 +1,11 @@
 <?php
 
+	require_once("UserRepository.php");
+	require_once("User.php");
+
 class LoginModel {
+
+
 
 	// Kontroll av sessionvariabeln
 	public function getSessionUsername() {
@@ -16,7 +21,11 @@ class LoginModel {
 	// Kontroll av inloggningsuppgifter
 	public function login($username, $password) {
 
-		if ($username =='Admin' && $password =='Password'){
+		$db = new UserRepository();
+		$user = $db->getUser($username);
+
+
+		if ($username == $user->getName() && $password == $user->getPassword()){
 
 			$_SESSION['LoggedIn'] = true;
 			$_SESSION['username'] = $username;
